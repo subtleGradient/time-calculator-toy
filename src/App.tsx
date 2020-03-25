@@ -1,34 +1,33 @@
-import * as React from "react"
-import "./styles.css"
-import XRegExp from "xregexp"
 import dayjs from "dayjs"
-import createPersistedState from 'use-persisted-state';
+import calendar from "dayjs/plugin/calendar"
+import relativeTime from "dayjs/plugin/relativeTime"
+import React from "react"
+import createPersistedState from "use-persisted-state"
+import XRegExp from "xregexp"
+import "./styles.css"
 
-var calendar = require("dayjs/plugin/calendar")
 dayjs.extend(calendar)
-var relativeTime = require("dayjs/plugin/relativeTime")
 dayjs.extend(relativeTime)
 
-window["dayjs"] = dayjs
-window["XRegExp"] = XRegExp
+;(window as any)["dayjs"] = dayjs
+;(window as any)["XRegExp"] = XRegExp
 
-const useCodeState = createPersistedState('code');
-const useExpressionState = createPersistedState('expression');
-
+const useCodeState = createPersistedState("code")
+const useExpressionState = createPersistedState("expression")
 
 // https://regexr.com/4vuv4
 const regexpMath = XRegExp(
   "(?<math>[+-])\\s*(?<mathValue>\\d+)(?<mathUnit>ms|[smhdw]|mo|y)\\b",
   "xgi",
 )
-window["regexpMath"] = regexpMath
+;(window as any)["regexpMath"] = regexpMath
 
 // https://regexr.com/4vv9q
 const regexpTime = XRegExp(
   "\\b(?<hour>\\d+)(?::(?<minute>\\d+))?(?<ampm>[ap]m)\\b|\\b(?<hour24>\\d+):(?<minute24>\\d+)\\b",
   "xgi",
 )
-window["regexpTime"] = regexpTime
+;(window as any)["regexpTime"] = regexpTime
 
 export default function App() {
   const [expression, setExpression] = useExpressionState(
@@ -39,9 +38,9 @@ export default function App() {
     
     So, when should I eat -1h lunch?`,
   )
-  const [code, setCode] = useCodeState()
-  const [result, setResult] = React.useState()
-  const [error, setError] = React.useState()
+  const [code, setCode] = useCodeState("")
+  const [result, setResult] = React.useState<dayjs.Dayjs | void>()
+  const [error, setError] = React.useState<Error | void>()
 
   React.useEffect(() => {
     const start = `Date.now()`
@@ -60,24 +59,12 @@ export default function App() {
       },
     )
 
-    XRegExp.forEach(
-      expression,
-      regexpMath,
-      ({
-        math,
-        mathUnit,
-        mathValue,
-      }: {
-        math: "-" | "+"
-        mathUnit: "ms" | "s" | "m" | "h" | "d" | "w" | "mo" | "y"
-        mathValue: string
-      }) => {
-        const method = { "-": "subtract", "+": "add" }[math]
-        maths.push(
-          `.${method}(${parseFloat(mathValue)}, ${JSON.stringify(mathUnit)})`,
-        )
-      },
-    )
+    XRegExp.forEach(expression, regexpMath, ({ math, mathUnit, mathValue }) => {
+      const method = { "-": "subtract", "+": "add" }[math as "-" | "+"]
+      maths.push(
+        `.${method}(${parseFloat(mathValue)}, ${JSON.stringify(mathUnit)})`,
+      )
+    })
 
     const innerCode = `dayjs(${start})${newTimeCode}${maths.join("")}`
     setCode(() => innerCode)
@@ -87,7 +74,7 @@ export default function App() {
     if (typeof code !== "string") {
       return
     }
-    setError(null)
+    setError()
     try {
       const funk = new Function("dayjs", `return (${code})`)
       const newResult = funk(dayjs)
@@ -98,7 +85,7 @@ export default function App() {
       }
     } catch (e) {
       setError(e)
-      setResult(null)
+      setResult()
     }
   }, [code])
 
@@ -114,7 +101,7 @@ export default function App() {
           alignItems: "stretch",
         }}
       >
-        {result && (
+        {result != null && (
           <>
             <b>{result.fromNow()}</b>
             <i>

@@ -6,17 +6,18 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@types/use-persisted-state": "0.3.0",
-    "dayjs": "1.8.22",
-    "react": "16.13.0",
-    "react-dom": "16.13.0",
-    "react-scripts": "3.4.0",
+    "dayjs": "1.8.23",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-scripts": "3.4.1",
     "use-persisted-state": "0.3.0",
     "xregexp": "4.3.0"
   },
   "devDependencies": {
-    "@types/react": "16.9.19",
+    "@types/react": "16.9.25",
     "@types/react-dom": "16.9.5",
-    "typescript": "3.7.5"
+    "@types/xregexp": "^4.3.0",
+    "typescript": "3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,5 +30,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "prettier":{
+    "semi": false,
+    "trailingComma": "all"
+  }
 }
